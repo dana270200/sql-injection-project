@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Hapoalim - Account Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- White Header --- */
+        header {
+            background-color: #ffffff;
+            height: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10%;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .header-left { display: flex; align-items: center; }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .nav-link {
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .nav-link:hover { background-color: #f4f4f4; color: #d91c24; }
+
+        .logo-img { height: 40px; }
+
+        /* --- Huge Red Hero Section --- */
+        .red-hero {
+            background: linear-gradient(135deg, #df0e1c, #b01017);
+            color: white;
+            padding: 50px 10% 120px 10%;
+            text-align: left;
+        }
+
+        .greeting {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .balance-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .balance-amount {
+            font-size: 56px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .currency {
+            font-size: 24px;
+            font-weight: 400;
+            vertical-align: super;
+            margin-right: 5px;
+        }
+
+        /* --- Floating White Dashboard Card --- */
+        .content-area {
+            padding: 0 10%;
+            margin-top: -80px;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .dashboard-card {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            text-align: left;
+        }
+
+        .dashboard-card h3 {
+            font-size: 18px;
+            color: #d91c24;
+            margin-bottom: 20px;
+            font-weight: 600;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .account-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .account-item:last-child { border-bottom: none; }
+
+        .account-name {
+            font-size: 15px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .account-val {
+            font-size: 16px;
+            color: #333;
+        }
+
+        /* --- Benign Credit Cards Section --- */
+        .cc-full-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .cc-details-full {
+            text-align: left;
+            font-family: monospace;
+            font-size: 14px;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
+        .security-warning {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <img src="logo.png" alt="Bank Hapoalim" class="logo-img" onerror="this.style.display='none'">
+        </div>
+        <div class="header-right">
+            <span class="nav-link">⚙️ Support</span>
+            <span class="nav-link">📍 Terms and conditions</span>
+            <a href="/" class="nav-link">Logout</a>
+        </div>
+    </header>
+
+    <div class="red-hero">
+        <div class="greeting" id="dynamic-greeting">Welcome, {{FULL_NAME}}</div>
+        <div class="balance-label">Total Account Balance</div>
+        <div class="balance-amount"><span class="currency">₪</span>{{BALANCE}}</div>
+    </div>
+
+    <div class="content-area">
+        <div class="dashboard-card">
+            <h3>Accounts Overview</h3>
+            
+            <div class="account-item">
+                <div class="account-name">Checking Account</div>
+                <div class="account-val">₪ {{BALANCE}}</div>
+            </div>
+            
+            <div class="account-item">
+                <div class="account-name">Savings</div>
+                <div class="account-val">₪ 12,500.00</div>
+            </div>
+
+            <h3 style="margin-top: 30px;">My Registered Credit Cards</h3>
+            
+            <div class="cc-full-item">
+                <div class="cc-details-full">
+                    <strong>Visa Signature (Active)</strong><br>
+                    <strong>Card:</strong> {{CC_NUMBER}}<br>
+                    <strong>Exp:</strong> {{CC_EXP}} | <strong>CVV:</strong> {{CC_CVV}}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="security-warning">
+        Secure Session • Bank Hapoalim Security Lab
+    </div>
+
+    <script>
+        // Only handles the time of day greeting now
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentHour = new Date().getHours();
+            let greetingText = "Good Evening";
+            
+            if (currentHour >= 5 && currentHour < 12) {
+                greetingText = "Good Morning";
+            } else if (currentHour >= 12 && currentHour < 18) {
+                greetingText = "Good Afternoon";
+            }
+            
+            const greetingElement = document.getElementById('dynamic-greeting');
+            // Replaces "Welcome" with the correct time, keeping the injected name
+            greetingElement.innerText = greetingElement.innerText.replace("Welcome", greetingText);
+        });
+    </script>
+
+</body>
+</html>
