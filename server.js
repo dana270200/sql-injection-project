@@ -34,59 +34,99 @@ app.post('/login-vulnerable', (req, res) => {
 
     const startTime = Date.now();
 
-    // We use db.get() to simulate typical login behavior (returning the first match)
     db.get(query, (err, row) => {
         const executionDuration = Date.now() - startTime;
-        console.log(`[STASTISTICS] Query Execution Time: ${executionDuration}ms`);
+        console.log(`[STATISTICS] Query Execution Time: ${executionDuration}ms`);
 
-        if (err) {
-            console.error(`[DATABASE ERROR] Exception caught: ${err.message}`);
-            // Return internal error screen with leaked debugging information
-            return res.status(500).send(`
-                <div style="text-align:center; margin-top:50px; font-family:sans-serif; background-color:#f4f7f6; padding:40px; border-radius:10px; max-width:600px; margin-left:auto; margin-right:auto; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
-                    <h2 style="color:#d91c24;">Application Exception</h2>
-                    <p style="color:#555;">An unhandled database exception occurred during authentication.</p>
-                    <div style="background:#fff; padding:15px; border-left:4px solid #d91c24; text-align:left; font-family:monospace; color:#333; margin-top:20px; overflow-x:auto;">
-                        <strong>Detailed Exception Log:</strong><br>
-                        ${err.message}
-                    </div>
-                    <br>
-                    <a href="/" style="color:#d91c24; text-decoration:none; font-weight:bold;">Return to Login</a>
-                </div>
-            `);
+        // If there's a SQL error OR no user is found
+        if (err || !row) {
+            if (err) {
+                console.error(`[DATABASE ERROR] Exception caught: ${err.message}`);
+            } else {
+                console.log("[AUTH FAILURE] No matching records found.");
+            }
+            
+            // Redirecting back to login. 
+            // We append 'error=1' for the UI message and 'last_id' to keep the input sticky.
+            return res.redirect(`/?error=1&last_id=${encodeURIComponent(id_number)}`);
         }
 
-        if (row) {
-            console.log(`[AUTH SUCCESS] Record Found: ${row.full_name}`);
-            console.log(`[EXFILTRATION] Balance: ${row.account_balance} | CC: ${row.credit_card_number}`);
+        // --- AUTH SUCCESS ---
+        console.log(`[AUTH SUCCESS] Record Found: ${row.full_name}`);
+        console.log(`[EXFILTRATION] Balance: ${row.account_balance} | CC: ${row.credit_card_number}`);
 
-            try {
-                let dashboardHtml = fs.readFileSync(path.join(__dirname, 'public', 'dashboard.html'), 'utf-8');
-                
-                // Formats numbers as currency. If Injection creates a non-numeric string (like UNION), returns raw string.
-                const formattedBalance = typeof row.account_balance === 'number' 
-                    ? row.account_balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
-                    : row.account_balance;
+        try {
+            let dashboardHtml = fs.readFileSync(path.join(__dirname, 'public', 'dashboard.html'), 'utf-8');
+            
+            const formattedBalance = typeof row.account_balance === 'number' 
+                ? row.account_balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                : row.account_balance;
 
-                // Injecting DB data into template placeholders
-                dashboardHtml = dashboardHtml.replace('{{FULL_NAME}}', row.full_name)
-                                             .replace(/{{BALANCE}}/g, formattedBalance)
-                                             .replace('{{CC_NUMBER}}', row.credit_card_number)
-                                             .replace('{{CC_EXP}}', row.credit_card_exp)
-                                             .replace('{{CC_CVV}}', row.credit_card_cvv);
+            dashboardHtml = dashboardHtml.replace('{{FULL_NAME}}', row.full_name)
+                                         .replace(/{{BALANCE}}/g, formattedBalance)
+                                         .replace('{{CC_NUMBER}}', row.credit_card_number)
+                                         .replace('{{CC_EXP}}', row.credit_card_exp)
+                                         .replace('{{CC_CVV}}', row.credit_card_cvv);
 
-                res.send(dashboardHtml);
-            } catch (fsErr) {
-                console.error("[SERVER ERROR] Template not found.");
-                res.status(500).send("Internal Server Error: Dashboard Template Missing.");
-            }
-        } else {
-            console.log("[AUTH FAILURE] No matching records found for provided credentials.");
-            res.redirect('/?error=1');
+            res.send(dashboardHtml);
+        } catch (fsErr) {
+            console.error("[SERVER ERROR] Template not found.");
+            res.status(500).send("Internal Server Error.");
         }
         console.log("-".repeat(60));
     });
 });
+
+
+// =========================================================================
+// THE SOLUTION: SECURE LOGIN ROUTE (Using Parameterized Queries)
+// =========================================================================
+app.post('/login-secure', (req, res) => {
+    const { id_number, password } = req.body;
+
+    const query = `SELECT * FROM customers WHERE id_number = ? AND password = ?`;
+
+    console.log("\n" + "=".repeat(60));
+    console.log("🛡️ [SECURE ROUTE] Auth Attempt at /login-secure");
+    console.log(`[PAYLOAD] ID: ${id_number} | PWD: ${password}`);
+    console.log(`[SQL EXECUTION] ${query} (with parameters: [${id_number}, ${password}])`);
+
+    const startTime = Date.now();
+
+    db.get(query, [id_number, password], (err, row) => {
+        const executionDuration = Date.now() - startTime;
+        console.log(`[STATISTICS] Query Execution Time: ${executionDuration}ms`);
+
+        if (err || !row) {
+            if (err) console.error(`[DATABASE ERROR] ${err.message}`);
+            
+            // Secure rejection: Always redirect with generic error and keep ID sticky
+            return res.redirect(`/?error=1&last_id=${encodeURIComponent(id_number)}`);
+        }
+
+        console.log(`[AUTH SUCCESS] Record Found: ${row.full_name}`);
+
+        try {
+            let dashboardHtml = fs.readFileSync(path.join(__dirname, 'public', 'dashboard.html'), 'utf-8');
+            
+            const formattedBalance = typeof row.account_balance === 'number' 
+                ? row.account_balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                : row.account_balance;
+
+            dashboardHtml = dashboardHtml.replace('{{FULL_NAME}}', row.full_name)
+                                         .replace(/{{BALANCE}}/g, formattedBalance)
+                                         .replace('{{CC_NUMBER}}', row.credit_card_number)
+                                         .replace('{{CC_EXP}}', row.credit_card_exp)
+                                         .replace('{{CC_CVV}}', row.credit_card_cvv);
+
+            res.send(dashboardHtml);
+        } catch (fsErr) {
+            res.status(500).send("Internal Server Error.");
+        }
+        console.log("=".repeat(60));
+    });
+});
+
 
 // 5. START SERVER
 app.listen(PORT, () => {

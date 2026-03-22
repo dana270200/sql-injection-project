@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bank Hapoalim - Secure Login Portal</title>
+    <title>Bank Hapoalim-Login Portal</title>
+    <link rel="icon" type="image/png" href="logo_small.jpg">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -61,8 +62,15 @@
             color: #d91c24;
         }
 
+        /* SECRET TOGGLE STYLE */
         .logo-img {
             height: 40px;
+            cursor: pointer; 
+            transition: transform 0.1s active;
+        }
+
+        .logo-img:active {
+            transform: scale(0.98);
         }
 
         /* --- Main Content Area --- */
@@ -96,7 +104,6 @@
             margin-bottom: 25px;
         }
 
-        /* --- Error Message Styling (English / LTR) --- */
         .error-message {
             display: none;
             background-color: #fff5f5;
@@ -165,13 +172,36 @@
             background: linear-gradient(to bottom, #e3252d, #bd151c);
         }
 
+        /* SECRET NOTIFICATION (TOAST) */
+        .toast-notification {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            z-index: 100;
+            left: 30px;
+            bottom: 30px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .toast-notification.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
     </style>
 </head>
 <body>
 
     <header>
         <div class="header-left">
-            <img src="logo.png" alt="Bank Hapoalim" class="logo-img" onerror="this.style.display='none'">
+            <img src="logo.png" alt="Bank Hapoalim" class="logo-img" id="secretToggle" onerror="this.style.border='1px solid red'; this.style.padding='5px';">
         </div>
         <div class="header-right">
             <span class="nav-link">⚙️ Support</span>
@@ -188,33 +218,68 @@
                 The ID number or password you entered is incorrect.
             </div>
             
-            <form action="/login-vulnerable" method="POST">
+            <form id="loginForm" action="/login-vulnerable" method="POST">
                 <div class="input-group">
                     <label>ID Number</label>
                     <div class="input-wrapper">
-                        <input type="text" name="id_number" value="123456789" required>
+                        <input type="text" name="id_number" placeholder="Enter ID number" required>
                     </div>
                 </div>
 
                 <div class="input-group">
                     <label>Password</label>
                     <div class="input-wrapper">
-                        <input type="password" name="password" value="••••••••" required>
+                        <input type="password" name="password" placeholder="Enter password" required>
                     </div>
                 </div>
 
                 <a class="forgot-link">Forgot ID / Password</a>
-
                 <button type="submit" class="login-btn">Login</button>
             </form>
         </div>
     </main>
 
-    <script>
+    <div id="toast" class="toast-notification"></div>
+
+   <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('loginForm');
+            const secretLogo = document.getElementById('secretToggle');
+            const toast = document.getElementById('toast');
+            const idInput = document.querySelector('input[name="id_number"]'); 
+            
+            let isSecureMode = false;
+
+            // --- Sticky ID Logic ---
             const urlParams = new URLSearchParams(window.location.search);
+            
+            // 1. Check if we have a last_id from a failed login
+            if (urlParams.get('last_id')) {
+                idInput.value = urlParams.get('last_id');
+            }
+
+            // 2. Show error message if needed
             if (urlParams.get('error') === '1') {
                 document.getElementById('login-error').style.display = 'block';
+            }
+
+            // --- Secret Toggle (Logo Click) ---
+            secretLogo.addEventListener('click', () => {
+                isSecureMode = !isSecureMode;
+                if (isSecureMode) {
+                    form.action = '/login-secure';
+                    showToast("🔒 Security Protocol: ENABLED", true);
+                } else {
+                    form.action = '/login-vulnerable';
+                    showToast("🔓 Security Protocol: DISABLED", false);
+                }
+            });
+
+            function showToast(message, isSecure) {
+                toast.textContent = message;
+                toast.style.borderLeft = isSecure ? '5px solid #28a745' : '5px solid #d91c24';
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 2500);
             }
         });
     </script>
