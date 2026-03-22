@@ -4,231 +4,314 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bank Hapoalim - Account Dashboard</title>
+    <link rel="icon" type="image/png" href="logo_small.jpg">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Open Sans', sans-serif; background: #f4f7f6; min-height: 100vh; }
 
-        body {
-            font-family: 'Open Sans', sans-serif;
-            background-color: #f4f7f6;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* --- White Header --- */
         header {
-            background-color: #ffffff;
-            height: 80px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 10%;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            z-index: 10;
+            background: #fff; height: 70px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 5%; border-bottom: 1px solid rgba(0,0,0,0.07);
+            position: sticky; top: 0; z-index: 50;
         }
-
-        .header-left { display: flex; align-items: center; }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            color: #333;
-            font-size: 14px;
-        }
-
+        .logo-img { height: 36px; }
+        .header-right { display: flex; align-items: center; gap: 8px; }
         .nav-link {
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 20px;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            text-decoration: none;
-            color: #333;
+            padding: 7px 14px; border-radius: 20px; font-size: 13px;
+            cursor: pointer; text-decoration: none; color: #444;
+            transition: background 0.15s;
+        }
+        .nav-link:hover { background: #f4f4f4; color: #d91c24; }
+
+        /* hero */
+        .hero {
+            background: linear-gradient(135deg, #df0e1c, #9b0d14);
+            color: #fff; padding: 28px 5% 70px;
+            display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;
+        }
+        .hero-greeting { font-size: 14px; opacity: 0.8; margin-bottom: 4px; }
+        .hero-name { font-size: 22px; font-weight: 600; margin-bottom: 16px; }
+        .hero-balance-label { font-size: 12px; opacity: 0.75; margin-bottom: 4px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .hero-balance { font-size: 42px; font-weight: 700; letter-spacing: -1px; }
+        .hero-balance sup { font-size: 18px; font-weight: 400; vertical-align: super; margin-right: 3px; }
+
+        .hero-stats { display: flex; gap: 24px; }
+        .hero-stat { text-align: right; }
+        .hero-stat-label { font-size: 11px; opacity: 0.7; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-stat-val   { font-size: 18px; font-weight: 600; }
+
+        /* main grid */
+        .main-grid {
+            padding: 0 5%; margin-top: -48px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 16px;
         }
 
-        .nav-link:hover { background-color: #f4f4f4; color: #d91c24; }
-
-        .logo-img { height: 40px; }
-
-        /* --- Huge Red Hero Section --- */
-        .red-hero {
-            background: linear-gradient(135deg, #df0e1c, #b01017);
-            color: white;
-            padding: 50px 10% 120px 10%;
-            text-align: left;
+        .card {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 22px 24px; overflow: hidden;
+        }
+        .card-title {
+            font-size: 12px; font-weight: 700; letter-spacing: 0.8px;
+            text-transform: uppercase; color: #999; margin-bottom: 16px;
         }
 
-        .greeting {
-            font-size: 24px;
-            font-weight: 300;
-            margin-bottom: 10px;
-            letter-spacing: 0.5px;
+        /* card spanning */
+        .card-accounts { grid-column: 1 / 2; }
+        .card-cc       { grid-column: 2 / 3; }
+        .card-transfer { grid-column: 3 / 4; }
+
+        /* account rows */
+        .acc-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid #f2f2f2;
+        }
+        .acc-row:last-child { border-bottom: none; }
+        .acc-label { font-size: 14px; color: #555; }
+        .acc-val   { font-size: 15px; font-weight: 600; color: #222; }
+        .acc-badge {
+            display: inline-block; font-size: 10px; padding: 2px 7px;
+            border-radius: 10px; margin-left: 6px; font-weight: 600;
+            background: #fff0f0; color: #c0392b; vertical-align: middle;
         }
 
-        .balance-label {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 5px;
+        /* credit card visual */
+        .cc-visual {
+            width: 100%; aspect-ratio: 1.586;
+            border-radius: 12px; padding: 18px 20px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #fff; display: flex; flex-direction: column;
+            justify-content: space-between; position: relative; overflow: hidden;
+        }
+        .cc-circle {
+            position: absolute; border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+        .cc-circle.a { width: 160px; height: 160px; top: -50px; right: -30px; }
+        .cc-circle.b { width: 100px; height: 100px; bottom: -20px; left: 20px; }
+        .cc-bank { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; opacity: 0.8; z-index: 1; }
+        .chip {
+            width: 32px; height: 24px; border-radius: 4px;
+            background: linear-gradient(135deg, #c9a84c, #e8c96b, #a8842a);
+            z-index: 1;
+        }
+        .cc-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .cc-number {
+            font-family: 'Courier New', monospace; font-size: 15px;
+            letter-spacing: 2px; font-weight: 600; z-index: 1;
+        }
+        .cc-bottom { display: flex; justify-content: space-between; align-items: flex-end; z-index: 1; }
+        .cc-field-label { font-size: 8px; opacity: 0.6; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
+        .cc-field-val   { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; }
+        .cc-visa { font-size: 20px; font-style: italic; font-weight: 900; letter-spacing: -2px; opacity: 0.9; }
+        .cc-visa span:first-child { color: #eb001b; }
+        .cc-visa span:last-child  { color: #f79e1b; margin-left: -8px; }
+
+        /* transfer form */
+        .tf-field { margin-bottom: 12px; }
+        .tf-field label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: #888; margin-bottom: 4px; text-transform: uppercase; }
+        .tf-field input {
+            width: 100%; height: 38px; border: 1px solid #e0e0e0;
+            border-radius: 7px; padding: 0 11px; font-size: 13px;
+            background: #fafafa; outline: none; transition: border-color 0.2s;
+            font-family: 'Open Sans', sans-serif;
+        }
+        .tf-field input:focus { border-color: #d91c24; background: #fff; }
+        .tf-row { display: flex; gap: 10px; }
+        .tf-row .tf-field { flex: 1; }
+        .tf-error { display: none; font-size: 11px; color: #c0392b; margin-top: 4px; font-weight: 600; }
+        .tf-btn {
+            width: 100%; height: 40px; margin-top: 4px;
+            background: linear-gradient(to right, #d91c24, #a50e17);
+            color: #fff; border: none; border-radius: 8px;
+            font-size: 13px; font-weight: 700; letter-spacing: 0.3px;
+            cursor: pointer; transition: opacity 0.2s;
+        }
+        .tf-btn:hover { opacity: 0.88; }
+        .tf-success {
+            display: none; margin-top: 12px; padding: 11px 14px;
+            background: #f0fff4; border: 1px solid #9ae6b4;
+            border-radius: 8px; font-size: 12px; color: #1e7e34;
+            font-weight: 600; line-height: 1.5;
         }
 
-        .balance-amount {
-            font-size: 56px;
-            font-weight: 700;
-            letter-spacing: -1px;
-        }
-
-        .currency {
-            font-size: 24px;
-            font-weight: 400;
-            vertical-align: super;
-            margin-right: 5px;
-        }
-
-        /* --- Floating White Dashboard Card --- */
-        .content-area {
-            padding: 0 10%;
-            margin-top: -80px;
-            display: flex;
-            justify-content: flex-start;
-        }
-
-        .dashboard-card {
-            background-color: #ffffff;
-            width: 100%;
-            max-width: 500px;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            text-align: left;
-        }
-
-        .dashboard-card h3 {
-            font-size: 18px;
-            color: #d91c24;
-            margin-bottom: 20px;
-            font-weight: 600;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 10px;
-        }
-
-        .account-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .account-item:last-child { border-bottom: none; }
-
-        .account-name {
-            font-size: 15px;
-            color: #555;
-            font-weight: 600;
-        }
-
-        .account-val {
-            font-size: 16px;
-            color: #333;
-        }
-
-        /* --- Benign Credit Cards Section --- */
-        .cc-full-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 15px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .cc-details-full {
-            text-align: left;
-            font-family: monospace;
-            font-size: 14px;
-            color: #2d3748;
-            line-height: 1.6;
-        }
-
-        .security-warning {
-            margin-top: 40px;
-            text-align: center;
-            font-size: 12px;
-            color: #888;
-        }
-
+        .security-note { text-align: center; font-size: 11px; color: #bbb; padding: 28px 0 20px; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="header-left">
-            <img src="logo.png" alt="Bank Hapoalim" class="logo-img" onerror="this.style.display='none'">
-        </div>
-        <div class="header-right">
-            <span class="nav-link">⚙️ Support</span>
-            <span class="nav-link">📍 Terms and conditions</span>
-            <a href="/" class="nav-link">Logout</a>
-        </div>
-    </header>
+<header>
+    <img src="logo.png" alt="Bank Hapoalim" class="logo-img" onerror="this.style.display='none'">
+    <div class="header-right">
+        <span class="nav-link">Support</span>
+        <span class="nav-link">Help</span>
+        <a href="/" class="nav-link">Logout</a>
+    </div>
+</header>
 
-    <div class="red-hero">
-        <div class="greeting" id="dynamic-greeting">Welcome, {{FULL_NAME}}</div>
-        <div class="balance-label">Total Account Balance</div>
-        <div class="balance-amount"><span class="currency">₪</span>{{BALANCE}}</div>
+<div class="hero">
+    <div>
+        <div class="hero-greeting" id="heroGreeting">Good morning,</div>
+        <div class="hero-name" id="heroName">{{FULL_NAME}}</div>
+        <div class="hero-balance-label">Total balance</div>
+        <div class="hero-balance"><sup>₪</sup><span id="heroBalance">{{BALANCE}}</span></div>
+    </div>
+    <div class="hero-stats">
+        <div class="hero-stat">
+            <div class="hero-stat-label">Checking</div>
+            <div class="hero-stat-val">₪<span class="balance-display">{{BALANCE}}</span></div>
+        </div>
+    </div>
+</div>
+
+<div class="main-grid">
+
+    <!-- Accounts -->
+    <div class="card card-accounts">
+        <div class="card-title">Accounts</div>
+        <div class="acc-row">
+            <span class="acc-label">Checking <span class="acc-badge">Active</span></span>
+            <span class="acc-val">₪<span class="balance-display">{{BALANCE}}</span></span>
+        </div>
+        <div class="acc-row">
+            <span class="acc-label">Loan</span>
+            <span class="acc-val" style="color:#c0392b;">₪0.00</span>
+        </div>
     </div>
 
-    <div class="content-area">
-        <div class="dashboard-card">
-            <h3>Accounts Overview</h3>
-            
-            <div class="account-item">
-                <div class="account-name">Checking Account</div>
-                <div class="account-val">₪ {{BALANCE}}</div>
+    <!-- Credit Card -->
+    <div class="card card-cc">
+        <div class="card-title">Credit Card</div>
+        <div class="cc-visual">
+            <div class="cc-circle a"></div>
+            <div class="cc-circle b"></div>
+            <div class="cc-top">
+                <span class="cc-bank">BANK HAPOALIM</span>
+                <div class="chip"></div>
             </div>
-            
-            <div class="account-item">
-                <div class="account-name">Savings</div>
-                <div class="account-val">₪ 12,500.00</div>
-            </div>
-
-            <h3 style="margin-top: 30px;">My Registered Credit Cards</h3>
-            
-            <div class="cc-full-item">
-                <div class="cc-details-full">
-                    <strong>Visa Signature (Active)</strong><br>
-                    <strong>Card:</strong> {{CC_NUMBER}}<br>
-                    <strong>Exp:</strong> {{CC_EXP}} | <strong>CVV:</strong> {{CC_CVV}}
+            <div class="cc-number">{{CC_NUMBER}}</div>
+            <div class="cc-bottom">
+                <div>
+                    <div class="cc-field-label">Card holder</div>
+                    <div class="cc-field-val">{{FULL_NAME}}</div>
                 </div>
+                <div>
+                    <div class="cc-field-label">Expires</div>
+                    <div class="cc-field-val">{{CC_EXP}}</div>
+                </div>
+                <div>
+                    <div class="cc-field-label">CVV</div>
+                    <div class="cc-field-val">{{CC_CVV}}</div>
+                </div>
+                <div class="cc-visa"><span>●</span><span>●</span></div>
             </div>
-
         </div>
     </div>
 
-    <div class="security-warning">
-        Secure Session • Bank Hapoalim Security Lab
+    <!-- Transfer -->
+    <div class="card card-transfer">
+        <div class="card-title">Transfer Funds</div>
+
+        <div class="tf-field">
+            <label>Recipient name</label>
+            <input type="text" id="recipientName" placeholder="e.g. David Cohen" required>
+        </div>
+        <div class="tf-row">
+            <div class="tf-field">
+                <label>Bank no.</label>
+                <input type="text" id="bankNum" placeholder="e.g. 12" required>
+            </div>
+            <div class="tf-field">
+                <label>Branch no.</label>
+                <input type="text" id="branchNum" placeholder="e.g. 648" required>
+            </div>
+        </div>
+        <div class="tf-field">
+            <label>Account no.</label>
+            <input type="text" id="accountNum" placeholder="e.g. 123456" required>
+        </div>
+        <div class="tf-field">
+            <label>Amount (₪)</label>
+            <input type="number" id="transferAmount" placeholder="e.g. 500" min="1" required>
+            <div class="tf-error" id="tfError"></div>
+        </div>
+
+        <button class="tf-btn" id="confirmTransfer">Confirm Transfer</button>
+        <div class="tf-success" id="tfSuccess"></div>
     </div>
 
-    <script>
-        // Only handles the time of day greeting now
-        document.addEventListener('DOMContentLoaded', () => {
-            const currentHour = new Date().getHours();
-            let greetingText = "Good Evening";
-            
-            if (currentHour >= 5 && currentHour < 12) {
-                greetingText = "Good Morning";
-            } else if (currentHour >= 12 && currentHour < 18) {
-                greetingText = "Good Afternoon";
-            }
-            
-            const greetingElement = document.getElementById('dynamic-greeting');
-            // Replaces "Welcome" with the correct time, keeping the injected name
-            greetingElement.innerText = greetingElement.innerText.replace("Welcome", greetingText);
+</div>
+
+<div class="security-note">Secure Session &nbsp;•&nbsp; Bank Hapoalim Security Lab</div>
+
+<script>
+    const h = new Date().getHours();
+    document.getElementById('heroGreeting').textContent =
+        (h < 12 ? 'Good morning,' : h < 18 ? 'Good afternoon,' : 'Good evening,');
+
+    const FULL_NAME = document.getElementById('heroName').textContent;
+    document.querySelector('.cc-field-val').textContent = FULL_NAME;
+
+
+    // Transfer
+    document.getElementById('confirmTransfer').onclick = async () => {
+        const recipient = document.getElementById('recipientName').value.trim();
+        const bank      = document.getElementById('bankNum').value.trim();
+        const branch    = document.getElementById('branchNum').value.trim();
+        const account   = document.getElementById('accountNum').value.trim();
+        const amount    = parseFloat(document.getElementById('transferAmount').value);
+        const errEl     = document.getElementById('tfError');
+
+        errEl.style.display = 'none';
+
+        if (!recipient || !bank || !branch || !account || !amount || amount <= 0) {
+            errEl.textContent = 'Please fill in all fields.';
+            errEl.style.display = 'block';
+            return;
+        }
+
+        const currentBalance = parseFloat(
+            document.getElementById('heroBalance').innerText.replace(/,/g, '')
+        );
+
+        if (amount > currentBalance) {
+            errEl.textContent = 'Insufficient funds.';
+            errEl.style.display = 'block';
+            return;
+        }
+
+        const res  = await fetch('/transfer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                from_name: FULL_NAME, amount,
+                target_account: `${recipient} | Bank: ${bank} | Branch: ${branch} | Acc: ${account}`,
+                current_balance: currentBalance
+            })
         });
-    </script>
+        const data = await res.json();
+
+        const fmt = parseFloat(data.newBalance).toLocaleString('en-US', { minimumFractionDigits: 2 });
+        document.getElementById('heroBalance').innerText = fmt;
+        document.querySelectorAll('.balance-display').forEach(el => el.innerText = fmt);
+
+        const suc = document.getElementById('tfSuccess');
+        suc.innerHTML = `Transfer approved — ₪${amount.toLocaleString()} to ${recipient}<br>Bank ${bank} / Branch ${branch} / Acc ${account}`;
+        suc.style.display = 'block';
+        setTimeout(() => suc.style.display = 'none', 6000);
+
+        document.getElementById('recipientName').value = '';
+        document.getElementById('bankNum').value = '';
+        document.getElementById('branchNum').value = '';
+        document.getElementById('accountNum').value = '';
+        document.getElementById('transferAmount').value = '';
+    };
+</script>
 
 </body>
 </html>

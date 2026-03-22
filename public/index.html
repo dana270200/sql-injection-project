@@ -3,209 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bank Hapoalim-Login Portal</title>
+    <title>Bank Hapoalim - Login Portal</title>
     <link rel="icon" type="image/png" href="logo_small.jpg">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
             font-family: 'Open Sans', sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            overflow-x: hidden;
+            display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden;
+            position: relative; /* Required for absolute positioning of the secret triggers */
         }
-
+        
         /* --- Header Styling --- */
         header {
-            background-color: #ffffff;
-            height: 80px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 10%;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            z-index: 10;
+            background-color: #ffffff; height: 80px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 10%; border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 10;
         }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            color: #333;
-            font-size: 14px;
-        }
-
+        .header-left { display: flex; align-items: center; }
+        .header-right { display: flex; align-items: center; gap: 20px; color: #333; font-size: 14px; }
         .nav-link {
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 20px;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            cursor: pointer; padding: 8px 12px; border-radius: 20px;
+            transition: all 0.2s ease; display: flex; align-items: center; gap: 5px;
         }
-
-        .nav-link:hover {
-            background-color: #f4f4f4;
-            color: #d91c24;
-        }
-
-        /* SECRET TOGGLE STYLE */
-        .logo-img {
-            height: 40px;
-            cursor: pointer; 
-            transition: transform 0.1s active;
-        }
-
-        .logo-img:active {
-            transform: scale(0.98);
-        }
-
+        .nav-link:hover { background-color: #f4f4f4; color: #d91c24; }
+        .logo-img { height: 40px; }
+        
         /* --- Main Content Area --- */
         main {
-            flex: 1;
-            position: relative;
+            flex: 1; position: relative;
             background-image: url('background.png');
-            background-size: cover; 
-            background-position: center 20%; 
-            background-repeat: no-repeat;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            padding-left: 10%;
+            background-size: cover; background-position: center 20%; background-repeat: no-repeat;
+            display: flex; justify-content: flex-start; align-items: center; padding-left: 10%;
         }
-
+        
         .login-card {
-            background-color: #ffffff;
-            width: 380px;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            text-align: center;
-            margin-top: -50px;
+            background-color: #ffffff; width: 380px; padding: 40px;
+            border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center; margin-top: -50px;
+            z-index: 20; /* Ensures the form stays above the invisible triggers */
         }
-
-        .login-card h2 {
-            font-size: 24px;
-            color: #444;
-            font-weight: 600;
-            margin-bottom: 25px;
-        }
-
+        
+        .login-card h2 { font-size: 24px; color: #444; font-weight: 600; margin-bottom: 25px; }
+        
         .error-message {
-            display: none;
-            background-color: #fff5f5;
-            color: #c53030;
-            border: 1px solid #fed7d7;
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            text-align: left;
+            display: none; background-color: #fff5f5; color: #c53030;
+            border: 1px solid #fed7d7; padding: 12px; border-radius: 4px;
+            margin-bottom: 20px; font-size: 13px; text-align: left;
         }
-
-        .input-group {
-            text-align: left;
-            margin-bottom: 20px;
-        }
-
-        .input-group label {
-            display: block;
-            font-size: 13px;
-            color: #333;
-            margin-bottom: 5px;
-            font-weight: 400;
-        }
-
+        
+        /* --- Form Inputs --- */
+        .input-group { text-align: left; margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 13px; color: #333; margin-bottom: 5px; font-weight: 400; }
         .input-wrapper input {
-            width: 100%;
-            height: 40px;
-            background-color: #eef3fb;
-            border: 1px solid #d1d9e6;
-            border-radius: 4px;
-            padding: 0 12px;
-            font-size: 14px;
-            color: #333;
-            outline: none;
+            width: 100%; height: 40px; background-color: #eef3fb;
+            border: 1px solid #d1d9e6; border-radius: 4px;
+            padding: 0 12px; font-size: 14px; color: #333; outline: none;
         }
-
-        .input-wrapper input:focus {
-            border-color: #8bb4e7;
-        }
-
+        .input-wrapper input:focus { border-color: #8bb4e7; }
+        
         .forgot-link {
-            display: block;
-            font-size: 13px;
-            color: #666;
-            text-decoration: underline;
-            margin-bottom: 30px;
-            cursor: pointer;
-            text-align: center;
+            display: block; font-size: 13px; color: #666;
+            text-decoration: underline; margin-bottom: 30px; cursor: pointer; text-align: center;
         }
-
+        
         .login-btn {
-            width: 150px;
-            height: 44px;
+            width: 150px; height: 44px;
             background: linear-gradient(to bottom, #d91c24, #b01017);
-            color: white;
-            border: none;
-            border-radius: 22px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
+            color: white; border: none; border-radius: 22px;
+            font-size: 16px; font-weight: 600; cursor: pointer;
             box-shadow: 0 4px 6px rgba(217, 28, 36, 0.3);
         }
-
-        .login-btn:hover {
-            background: linear-gradient(to bottom, #e3252d, #bd151c);
-        }
-
-        /* SECRET NOTIFICATION (TOAST) */
+        .login-btn:hover { background: linear-gradient(to bottom, #e3252d, #bd151c); }
+        
+        /* --- Toast Notification System --- */
         .toast-notification {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 4px;
-            padding: 16px;
-            position: fixed;
-            z-index: 100;
-            left: 30px;
-            bottom: 30px;
-            font-size: 14px;
-            opacity: 0;
-            transition: opacity 0.3s, visibility 0.3s;
+            visibility: hidden; min-width: 250px; background-color: #333; color: #fff;
+            text-align: center; border-radius: 4px; padding: 16px;
+            position: fixed; z-index: 100; left: 30px; bottom: 30px;
+            font-size: 14px; opacity: 0; transition: opacity 0.3s, visibility 0.3s;
+        }
+        .toast-notification.show { visibility: visible; opacity: 1; }
+
+        /* =========================================
+           INVISIBLE SECRET TRIGGERS
+           ========================================= */
+        .secret-btn {
+            position: absolute;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 15; /* Sits between the background image and the login card */
+            opacity: 0;  /* Completely invisible to the user */
+        }
+        
+        /* Right Trigger -> Enables Vulnerable Mode */
+        #vulnerable-trigger {
+            top: 20%;  
+            right: 0;    
+            width: 20%;  
+            height: 60%; 
+        }
+        
+        /* Left Trigger -> Enables Secure Mode */
+        #secure-trigger {
+            top: 20%;  
+            right: 21%;  /* Positioned immediately to the left of the vulnerable trigger */
+            width: 20%;  
+            height: 60%; 
         }
 
-        .toast-notification.show {
-            visibility: visible;
-            opacity: 1;
+        /* =========================================
+           MODAL (POPUP) STYLING
+           ========================================= */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); z-index: 1000;
+            justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s ease;
         }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        
+        .modal-content {
+            background: #fff; width: 600px; max-width: 90%;
+            border-radius: 8px; padding: 30px; box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            position: relative; transform: translateY(-20px); transition: transform 0.3s ease;
+        }
+        .modal-overlay.show .modal-content { transform: translateY(0); }
+        
+        .modal-close {
+            position: absolute; top: 15px; right: 20px; font-size: 24px;
+            color: #888; cursor: pointer; border: none; background: none;
+        }
+        .modal-close:hover { color: #d91c24; }
+        
+        .modal-header { font-size: 20px; font-weight: 700; color: #333; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+        .modal-body { font-size: 14px; color: #555; line-height: 1.6; }
+        
+        /* Modal specific typography */
+        .modal-body h4 { color: #d91c24; margin-top: 15px; margin-bottom: 5px; font-size: 15px; }
+        .modal-body code { background: #f4f4f4; padding: 3px 6px; border-radius: 4px; font-family: monospace; color: #c53030; font-size: 13px; display: inline-block; margin-bottom: 10px; }
+        .modal-body p { margin-bottom: 10px; }
 
     </style>
 </head>
 <body>
+    <button class="secret-btn" id="vulnerable-trigger" title="Enable Vulnerable Mode"></button>
+    <button class="secret-btn" id="secure-trigger" title="Enable Secure Mode"></button>
 
     <header>
         <div class="header-left">
-            <img src="logo.png" alt="Bank Hapoalim" class="logo-img" id="secretToggle" onerror="this.style.border='1px solid red'; this.style.padding='5px';">
+            <img src="logo.png" alt="Bank Hapoalim" class="logo-img">
         </div>
         <div class="header-right">
-            <span class="nav-link">⚙️ Support</span>
-            <span class="nav-link">📍 Terms and conditions</span>
+            <span class="nav-link" id="navSupport">⚙️ Support</span>
+            <span class="nav-link" id="navTerms">📍 Terms and conditions</span>
         </div>
     </header>
 
@@ -218,68 +171,153 @@
                 The ID number or password you entered is incorrect.
             </div>
             
-            <form id="loginForm" action="/login-vulnerable" method="POST">
+            <form id="loginForm" action="/login-secure" method="POST">
                 <div class="input-group">
                     <label>ID Number</label>
                     <div class="input-wrapper">
-                        <input type="text" name="id_number" placeholder="Enter ID number" required>
+                        <input type="text" name="id_number" placeholder="Enter your ID number" required>
                     </div>
                 </div>
-
                 <div class="input-group">
                     <label>Password</label>
                     <div class="input-wrapper">
-                        <input type="password" name="password" placeholder="Enter password" required>
+                        <input type="password" name="password" placeholder="Enter your password" required>
                     </div>
                 </div>
-
                 <a class="forgot-link">Forgot ID / Password</a>
                 <button type="submit" class="login-btn">Login</button>
             </form>
         </div>
     </main>
 
+    <div class="modal-overlay" id="modalSupport">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModals()">&times;</button>
+            <div class="modal-header">Support & Penetration Testing Guide</div>
+            <div class="modal-body">
+                <p>Welcome to the Security Testing interface. Use the following payloads to demonstrate SQL Injection vulnerabilities when the system is in <b>Vulnerable Mode</b>.</p>
+                
+                <h4>1. Regular Authentication</h4>
+                ID: <code>343345800</code><br>
+                Password: <code>password123</code>
+                
+                <h4>2. Authentication Bypass (Password Field)</h4>
+                ID: <code>575841008</code><br>
+                Password: <code>' OR '1'='1</code>
+                
+                <h4>3. Authentication Bypass via SQL Comments (ID Field)</h4>
+                ID: <code>187196217' -- </code><br>
+                Password: <code>[Any random text]</code>
+                
+                <h4>4. Data Exfiltration (UNION-Based Attack)</h4>
+                ID: <code>999</code><br>
+                Password: <br><code>' UNION SELECT '000', GROUP_CONCAT(full_name || ' - CC: ' || credit_card_number), 'N/A', 0, '0', '0', '0' FROM customers -- </code>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalTerms">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModals()">&times;</button>
+            <div class="modal-header">Terms and Conditions</div>
+            <div class="modal-body">
+                <h3 style="color: #333; margin-bottom: 10px;">Security Research Project</h3>
+                <p><strong>Developed by:</strong> Dana</p>
+                <p><strong>Topic:</strong> SQL Injection (SQLi) Vulnerabilities and Secure Coding Practices.</p>
+                <p style="margin-top: 15px;">
+                    This application was developed as an educational demonstration of database security flaws. 
+                    It illustrates the critical differences between unparameterized string concatenation and the 
+                    secure implementation of Parameterized Queries (Prepared Statements).
+                </p>
+                <p style="margin-top: 15px; font-size: 12px; color: #888;">
+                    * All customer data, credit card numbers, and balances generated in this project are entirely fictional and used solely for academic purposes.
+                </p>
+            </div>
+        </div>
+    </div>
+
     <div id="toast" class="toast-notification"></div>
+    
+    <div id="statusEgg" style="position: fixed; bottom: 10px; right: 15px; font-size: 11px; color: rgba(0,0,0,0.15); cursor: default; transition: color 0.3s; font-family: monospace; z-index: 100;">v2.4.1</div>
 
-   <script>
+    <script>
+        // Modal Control Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        function closeModals() {
+            document.querySelectorAll('.modal-overlay').forEach(modal => {
+                modal.classList.remove('show');
+            });
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                closeModals();
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('loginForm');
-            const secretLogo = document.getElementById('secretToggle');
-            const toast = document.getElementById('toast');
-            const idInput = document.querySelector('input[name="id_number"]'); 
+            // DOM Elements
+            const form         = document.getElementById('loginForm');
+            const toast        = document.getElementById('toast');
+            const idInput      = document.querySelector('input[name="id_number"]');
+            const statusEgg    = document.getElementById('statusEgg');
             
-            let isSecureMode = false;
+            // Modal Triggers
+            document.getElementById('navSupport').addEventListener('click', () => openModal('modalSupport'));
+            document.getElementById('navTerms').addEventListener('click', () => openModal('modalTerms'));
+            
+            // Invisible Presentation Triggers
+            const vulnBtn      = document.getElementById('vulnerable-trigger');
+            const secureBtn    = document.getElementById('secure-trigger');
+            
+            // System State (Default: Secure)
+            let isSecureMode = true; 
 
-            // --- Sticky ID Logic ---
+            // --- Sticky Input Logic ---
             const urlParams = new URLSearchParams(window.location.search);
-            
-            // 1. Check if we have a last_id from a failed login
             if (urlParams.get('last_id')) {
                 idInput.value = urlParams.get('last_id');
             }
-
-            // 2. Show error message if needed
             if (urlParams.get('error') === '1') {
                 document.getElementById('login-error').style.display = 'block';
             }
 
-            // --- Secret Toggle (Logo Click) ---
-            secretLogo.addEventListener('click', () => {
-                isSecureMode = !isSecureMode;
-                if (isSecureMode) {
-                    form.action = '/login-secure';
-                    showToast("🔒 Security Protocol: ENABLED", true);
-                } else {
-                    form.action = '/login-vulnerable';
-                    showToast("🔓 Security Protocol: DISABLED", false);
-                }
+            // --- Presenter Toggles ---
+            vulnBtn.addEventListener('click', () => {
+                isSecureMode = false;
+                form.action = '/login-vulnerable';
+                showToast('🔓 Security Protocol: DISABLED', false);
             });
 
+            secureBtn.addEventListener('click', () => {
+                isSecureMode = true;
+                form.action = '/login-secure';
+                showToast('🔒 Security Protocol: ENABLED', true);
+            });
+
+            // --- Easter Egg Logic ---
+            statusEgg.addEventListener('mouseenter', () => {
+                statusEgg.textContent = isSecureMode ? '[ SECURE_MODE ]' : '[ VULN_MODE ]';
+                statusEgg.style.color = isSecureMode ? '#28a745' : '#d91c24';
+                statusEgg.style.fontWeight = 'bold';
+            });
+
+            statusEgg.addEventListener('mouseleave', () => {
+                statusEgg.textContent = 'v2.4.1';
+                statusEgg.style.color = 'rgba(0,0,0,0.15)';
+                statusEgg.style.fontWeight = 'normal';
+            });
+
+            // --- Utility Functions ---
             function showToast(message, isSecure) {
                 toast.textContent = message;
                 toast.style.borderLeft = isSecure ? '5px solid #28a745' : '5px solid #d91c24';
                 toast.classList.add('show');
-                setTimeout(() => { toast.classList.remove('show'); }, 2500);
+                setTimeout(() => toast.classList.remove('show'), 2500);
             }
         });
     </script>
