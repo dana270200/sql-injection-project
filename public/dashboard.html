@@ -6,151 +6,16 @@
     <title>Bank Hapoalim - Account Dashboard</title>
     <link rel="icon" type="image/png" href="logo_small.jpg">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Open Sans', sans-serif; background: #f4f7f6; min-height: 100vh; }
-
-        header {
-            background: #fff; height: 70px;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 5%; border-bottom: 1px solid rgba(0,0,0,0.07);
-            position: sticky; top: 0; z-index: 50;
-        }
-        .logo-img { height: 36px; }
-        .header-right { display: flex; align-items: center; gap: 8px; }
-        .nav-link {
-            padding: 7px 14px; border-radius: 20px; font-size: 13px;
-            cursor: pointer; text-decoration: none; color: #444;
-            transition: background 0.15s;
-        }
-        .nav-link:hover { background: #f4f4f4; color: #d91c24; }
-
-        /* hero */
-        .hero {
-            background: linear-gradient(135deg, #df0e1c, #9b0d14);
-            color: #fff; padding: 28px 5% 70px;
-            display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;
-        }
-        .hero-greeting { font-size: 14px; opacity: 0.8; margin-bottom: 4px; }
-        .hero-name { font-size: 22px; font-weight: 600; margin-bottom: 16px; }
-        .hero-balance-label { font-size: 12px; opacity: 0.75; margin-bottom: 4px; letter-spacing: 0.5px; text-transform: uppercase; }
-        .hero-balance { font-size: 42px; font-weight: 700; letter-spacing: -1px; }
-        .hero-balance sup { font-size: 18px; font-weight: 400; vertical-align: super; margin-right: 3px; }
-
-        .hero-stats { display: flex; gap: 24px; }
-        .hero-stat { text-align: right; }
-        .hero-stat-label { font-size: 11px; opacity: 0.7; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .hero-stat-val   { font-size: 18px; font-weight: 600; }
-
-        /* main grid */
-        .main-grid {
-            padding: 0 5%; margin-top: -48px;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: auto auto;
-            gap: 16px;
-        }
-
-        .card {
-            background: #fff; border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            padding: 22px 24px; overflow: hidden;
-        }
-        .card-title {
-            font-size: 12px; font-weight: 700; letter-spacing: 0.8px;
-            text-transform: uppercase; color: #999; margin-bottom: 16px;
-        }
-
-        /* card spanning */
-        .card-accounts { grid-column: 1 / 2; }
-        .card-cc       { grid-column: 2 / 3; }
-        .card-transfer { grid-column: 3 / 4; }
-
-        /* account rows */
-        .acc-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 0; border-bottom: 1px solid #f2f2f2;
-        }
-        .acc-row:last-child { border-bottom: none; }
-        .acc-label { font-size: 14px; color: #555; }
-        .acc-val   { font-size: 15px; font-weight: 600; color: #222; }
-        .acc-badge {
-            display: inline-block; font-size: 10px; padding: 2px 7px;
-            border-radius: 10px; margin-left: 6px; font-weight: 600;
-            background: #fff0f0; color: #c0392b; vertical-align: middle;
-        }
-
-        /* credit card visual */
-        .cc-visual {
-            width: 100%; aspect-ratio: 1.586;
-            border-radius: 12px; padding: 18px 20px;
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-            color: #fff; display: flex; flex-direction: column;
-            justify-content: space-between; position: relative; overflow: hidden;
-        }
-        .cc-circle {
-            position: absolute; border-radius: 50%;
-            background: rgba(255,255,255,0.05);
-        }
-        .cc-circle.a { width: 160px; height: 160px; top: -50px; right: -30px; }
-        .cc-circle.b { width: 100px; height: 100px; bottom: -20px; left: 20px; }
-        .cc-bank { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; opacity: 0.8; z-index: 1; }
-        .chip {
-            width: 32px; height: 24px; border-radius: 4px;
-            background: linear-gradient(135deg, #c9a84c, #e8c96b, #a8842a);
-            z-index: 1;
-        }
-        .cc-top { display: flex; justify-content: space-between; align-items: flex-start; }
-        .cc-number {
-            font-family: 'Courier New', monospace; font-size: 15px;
-            letter-spacing: 2px; font-weight: 600; z-index: 1;
-        }
-        .cc-bottom { display: flex; justify-content: space-between; align-items: flex-end; z-index: 1; }
-        .cc-field-label { font-size: 8px; opacity: 0.6; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
-        .cc-field-val   { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; }
-        .cc-visa { font-size: 20px; font-style: italic; font-weight: 900; letter-spacing: -2px; opacity: 0.9; }
-        .cc-visa span:first-child { color: #eb001b; }
-        .cc-visa span:last-child  { color: #f79e1b; margin-left: -8px; }
-
-        /* transfer form */
-        .tf-field { margin-bottom: 12px; }
-        .tf-field label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: #888; margin-bottom: 4px; text-transform: uppercase; }
-        .tf-field input {
-            width: 100%; height: 38px; border: 1px solid #e0e0e0;
-            border-radius: 7px; padding: 0 11px; font-size: 13px;
-            background: #fafafa; outline: none; transition: border-color 0.2s;
-            font-family: 'Open Sans', sans-serif;
-        }
-        .tf-field input:focus { border-color: #d91c24; background: #fff; }
-        .tf-row { display: flex; gap: 10px; }
-        .tf-row .tf-field { flex: 1; }
-        .tf-error { display: none; font-size: 11px; color: #c0392b; margin-top: 4px; font-weight: 600; }
-        .tf-btn {
-            width: 100%; height: 40px; margin-top: 4px;
-            background: linear-gradient(to right, #d91c24, #a50e17);
-            color: #fff; border: none; border-radius: 8px;
-            font-size: 13px; font-weight: 700; letter-spacing: 0.3px;
-            cursor: pointer; transition: opacity 0.2s;
-        }
-        .tf-btn:hover { opacity: 0.88; }
-        .tf-success {
-            display: none; margin-top: 12px; padding: 11px 14px;
-            background: #f0fff4; border: 1px solid #9ae6b4;
-            border-radius: 8px; font-size: 12px; color: #1e7e34;
-            font-weight: 600; line-height: 1.5;
-        }
-
-        .security-note { text-align: center; font-size: 11px; color: #bbb; padding: 28px 0 20px; }
-    </style>
+    
+    <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
 
 <header>
     <img src="logo.png" alt="Bank Hapoalim" class="logo-img" onerror="this.style.display='none'">
     <div class="header-right">
-        <span class="nav-link">Support</span>
-        <span class="nav-link">Help</span>
-        <a href="/" class="nav-link">Logout</a>
+        <span class="nav-link" id="navHelp">Help</span>
+        <a href="/" class="nav-link" id="navLogout">Logout</a>
     </div>
 </header>
 
@@ -170,8 +35,6 @@
 </div>
 
 <div class="main-grid">
-
-    <!-- Accounts -->
     <div class="card card-accounts">
         <div class="card-title">Accounts</div>
         <div class="acc-row">
@@ -184,7 +47,6 @@
         </div>
     </div>
 
-    <!-- Credit Card -->
     <div class="card card-cc">
         <div class="card-title">Credit Card</div>
         <div class="cc-visual">
@@ -198,7 +60,7 @@
             <div class="cc-bottom">
                 <div>
                     <div class="cc-field-label">Card holder</div>
-                    <div class="cc-field-val">{{FULL_NAME}}</div>
+                    <div class="cc-field-val" id="ccHolder">{{FULL_NAME}}</div>
                 </div>
                 <div>
                     <div class="cc-field-label">Expires</div>
@@ -213,10 +75,8 @@
         </div>
     </div>
 
-    <!-- Transfer -->
     <div class="card card-transfer">
         <div class="card-title">Transfer Funds</div>
-
         <div class="tf-field">
             <label>Recipient name</label>
             <input type="text" id="recipientName" placeholder="e.g. David Cohen" required>
@@ -240,78 +100,29 @@
             <input type="number" id="transferAmount" placeholder="e.g. 500" min="1" required>
             <div class="tf-error" id="tfError"></div>
         </div>
-
         <button class="tf-btn" id="confirmTransfer">Confirm Transfer</button>
         <div class="tf-success" id="tfSuccess"></div>
     </div>
-
 </div>
 
 <div class="security-note">Secure Session &nbsp;•&nbsp; Bank Hapoalim Security Lab</div>
 
-<script>
-    const h = new Date().getHours();
-    document.getElementById('heroGreeting').textContent =
-        (h < 12 ? 'Good morning,' : h < 18 ? 'Good afternoon,' : 'Good evening,');
+<div class="modal-overlay" id="modalHelp">
+    <div class="modal-content">
+        <button class="modal-close" id="closeHelp">&times;</button>
+        <div class="modal-header">Account Security Guidelines</div>
+        <div class="modal-body">
+            <p>At Bank Hapoalim, we take your account security extremely seriously. Please follow these guidelines:</p>
+            <ul>
+                <li><strong>Never Share Your Password:</strong> Our staff will never ask for your password.</li>
+                <li><strong>Use Complex Passwords:</strong> Strong passwords prevent unauthorized access.</li>
+                <li><strong>Avoid Public Wi-Fi:</strong> Perform transactions only on secured networks.</li>
+                <li><strong>Always Log Out:</strong> terminating your session securely is critical.</li>
+            </ul>
+        </div>
+    </div>
+</div>
 
-    const FULL_NAME = document.getElementById('heroName').textContent;
-    document.querySelector('.cc-field-val').textContent = FULL_NAME;
-
-
-    // Transfer
-    document.getElementById('confirmTransfer').onclick = async () => {
-        const recipient = document.getElementById('recipientName').value.trim();
-        const bank      = document.getElementById('bankNum').value.trim();
-        const branch    = document.getElementById('branchNum').value.trim();
-        const account   = document.getElementById('accountNum').value.trim();
-        const amount    = parseFloat(document.getElementById('transferAmount').value);
-        const errEl     = document.getElementById('tfError');
-
-        errEl.style.display = 'none';
-
-        if (!recipient || !bank || !branch || !account || !amount || amount <= 0) {
-            errEl.textContent = 'Please fill in all fields.';
-            errEl.style.display = 'block';
-            return;
-        }
-
-        const currentBalance = parseFloat(
-            document.getElementById('heroBalance').innerText.replace(/,/g, '')
-        );
-
-        if (amount > currentBalance) {
-            errEl.textContent = 'Insufficient funds.';
-            errEl.style.display = 'block';
-            return;
-        }
-
-        const res  = await fetch('/transfer', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                from_name: FULL_NAME, amount,
-                target_account: `${recipient} | Bank: ${bank} | Branch: ${branch} | Acc: ${account}`,
-                current_balance: currentBalance
-            })
-        });
-        const data = await res.json();
-
-        const fmt = parseFloat(data.newBalance).toLocaleString('en-US', { minimumFractionDigits: 2 });
-        document.getElementById('heroBalance').innerText = fmt;
-        document.querySelectorAll('.balance-display').forEach(el => el.innerText = fmt);
-
-        const suc = document.getElementById('tfSuccess');
-        suc.innerHTML = `Transfer approved — ₪${amount.toLocaleString()} to ${recipient}<br>Bank ${bank} / Branch ${branch} / Acc ${account}`;
-        suc.style.display = 'block';
-        setTimeout(() => suc.style.display = 'none', 6000);
-
-        document.getElementById('recipientName').value = '';
-        document.getElementById('bankNum').value = '';
-        document.getElementById('branchNum').value = '';
-        document.getElementById('accountNum').value = '';
-        document.getElementById('transferAmount').value = '';
-    };
-</script>
-
+<script src="dashboard.js"></script>
 </body>
 </html>

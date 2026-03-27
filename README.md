@@ -1,63 +1,219 @@
-# 🏦 Web Application SQL Injection Demo
+# 🏦 Web Application SQL Injection Demo (Bank Hapoalim Simulation)
 
-## Overview
-This mini-project is a comprehensive demonstration of SQL Injection (SQLi) vulnerabilities within a typical web application authentication flow. It was built to illustrate how unsanitized user input can lead to unauthorized access, data exfiltration, and complete system compromise, followed by the implementation of a secure solution.
+🎓 **Academic Project**
+Developed as part of the *Network Security* course
+**Ben-Gurion University of the Negev**
+Fall Semester 2025
+
+---
+
+## 📖 Overview
+
+This project is an interactive demonstration of **SQL Injection** vulnerabilities, built as a realistic simulation of a banking login system.
+
+It shows how unsafe handling of user input can lead to serious security issues such as:
+
+* Unauthorized access
+* Exposure of sensitive data
+* Full database leaks
+
+The system allows switching between a **vulnerable mode** and a **secure mode**, making it easy to see both how attacks work and how they can be prevented using modern security techniques.
+
+---
 
 ## 🎯 Project Objectives
-1. **Demonstrate Vulnerability:** Show how concatenating strings in SQL queries creates critical security flaws.
-2. **Execute Attacks:** Perform realistic attack scenarios including Auth Bypass, Time-Based Blind SQLi, and UNION-based injections.
-3. **Implement Defense:** Fix the vulnerability using modern security practices (Parameterized Queries).
+
+1. **Demonstrate Vulnerabilities**
+   Show how unsafe string concatenation in SQL queries leads to critical exploits.
+
+2. **Interactive Live Demo**
+   Seamlessly switch between:
+
+   * Vulnerable mode
+   * Secure mode
+
+3. **Simulate Real Attacks**
+
+   * Authentication bypass
+   * Blind SQL Injection (time-based)
+   * UNION-based data manipulation & exfiltration
+
+4. **Implement Strong Defenses**
+
+   * Parameterized queries
+   * Input validation (Regex)
+   * Rate limiting
+   * Password hashing (bcrypt)
+
+---
 
 ## 🛠️ Technologies Used
+
 * **Backend:** Node.js, Express.js
 * **Database:** SQLite3
-* **Frontend:** HTML5, CSS3, Vanilla JavaScript
+* **Security:** bcrypt, express-rate-limit
+* **Frontend:** HTML5, CSS3 (Bank UI simulation), Vanilla JavaScript
+
+---
 
 ## 🚀 Getting Started
 
-### Prerequisites
-Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
+### 1. Installation
 
-### Installation
-1. Clone the repository:
-   \`\`\`bash
-   git clone <YOUR_GITHUB_REPO_URL>
-   \`\`\`
-2. Install dependencies:
-   \`\`\`bash
-   npm install express sqlite3
-   \`\`\`
-3. Initialize the mock database (Generates 50 random customers with realistic data):
-   \`\`\`bash
-   node setup_db.js
-   \`\`\`
-4. Start the server:
-   \`\`\`bash
-   node server.js
-   \`\`\`
-5. Open your browser and navigate to \`http://localhost:3000\`
-
-## ⚔️ Attack Scenarios (Live Demo)
-
-The application has a vulnerable login route (`/login-vulnerable`). 
-
-### 1. Targeted Auth Bypass
-Injecting SQL into the password field to bypass authentication for a specific user ID.
-* **Payload (Password):** `' OR id_number='343345800`
-* **Result:** Grants access to the target's account without knowing the password.
-
-### 2. Heavy Computation (Time-Based) Attack
-Proving vulnerability when errors are suppressed by forcing the database into a heavy computation loop.
-* **Payload (Password):** `' OR (WITH RECURSIVE r(i) AS (VALUES(1) UNION ALL SELECT i+1 FROM r WHERE i < 5000000) SELECT count(*) FROM r) > 0 -- `
-* **Result:** The server response is delayed by several seconds, proving code execution.
-
-### 3. Data Forgery via UNION
-Injecting forged records directly into the application's UI.
-* **Payload (Password):** `' UNION SELECT '000', 'PENETRATION TEST', 'N/A', '999999.00', '4580-0000-0000-0000', '12/99', '000' -- `
-* **Result:** The dashboard displays the attacker's fabricated data.
-
-## 🛡️ The Solution: Parameterized Queries
-The project includes a secure route (`/login-secure`) that demonstrates how to prevent SQL injection. By using **Parameterized Queries** (Prepared Statements), the database engine treats user input strictly as data, not as executable code, completely neutralizing the attacks.
+```bash
+git clone https://github.com/dana270200/sql-injection-project
+cd sql-injection-project
+npm install
+```
 
 ---
-*Developed for educational purposes and network security demonstration.*
+
+### 2. Database Setup (Choose One)
+
+#### ✅ Option A: Use Existing Database
+
+A prebuilt database (`bank_data.sqlite`) is included.
+
+**Test User (only valid with existing DB):**
+
+* ID: `374787521`
+* Password: `pass1174`
+* Name: Iris Ozery
+
+> ⚠️ If you regenerate the database, this user will no longer exist.
+
+---
+
+#### 🔄 Option B: Generate New Database
+
+Creates 50 random users with fresh credentials:
+
+```bash
+rm bank_data.sqlite
+node setup_db.js
+node peek.js
+```
+
+Use the credentials printed by `peek.js`.
+
+---
+
+### 3. Run the Server
+
+```bash
+node server.js
+```
+
+Open:
+
+```
+http://localhost:3000
+```
+
+---
+
+## 🎭 Switching Between Modes
+
+The system includes **hidden UI triggers** for a seamless demo:
+
+* **Vulnerable Mode:** Click on *Irena* (background character)
+* **Secure Mode:** Click on *Hila Korach* (red jacket)
+
+A toast notification confirms the current mode.
+
+---
+
+## 🧰 Built-in Demo Tools
+
+* **Support Mode:**
+  A helper panel containing ready-to-use SQL injection payloads for quick demonstrations.
+
+* **peek.js:**
+  Displays valid login credentials directly from the database.
+
+* **Persistent Mode State:**
+  The selected mode (secure/vulnerable) is preserved via URL parameters when logging out.
+
+* **Terminal Logs:**
+  All actions are logged in real time:
+
+  * Login attempts
+  * SQL queries
+  * Execution times
+  * Money transfers
+
+---
+
+## ⚔️ Attack Scenarios (Vulnerable Mode Only)
+
+All attacks are performed by injecting input into the **ID** or **Password** fields in the login form.
+
+* **🔓 Authentication Bypass (ID field)**
+  Injecting a comment (`--`) allows login without validating the password.
+
+* **🔓 Tautology Bypass (Password field)**
+  Using a condition like `' OR '1'='1` forces the query to always return TRUE, granting access.
+
+* **⏱️ Time-Based Blind SQL Injection (Password field)**
+  A heavy SQL operation is injected to delay the response, proving code execution even without visible output.
+
+* **🧪 UNION-Based Injection (Password field)**
+  Injects custom data into the query results, allowing fake or manipulated user data to appear in the dashboard.
+
+* **📤 Data Exfiltration (Password field)**
+  Extracts sensitive information (e.g., names, IDs, credit cards) from the entire database into a single response.
+
+* **🚫 Validation Bypass**
+  Client-side restrictions can be bypassed, allowing direct interaction with backend logic.
+
+---
+
+## 💸 Post-Login Simulation
+
+After a successful login or attack:
+
+* View sensitive user data
+* Perform **simulated money transfers**
+* Observe balance changes in real time
+
+> ⚠️ Transfers are simulated (client-side) and do not persist in the database.
+
+---
+
+## 🛡️ Defense in Depth (Secure Mode)
+
+The `/login-secure` route implements layered security:
+
+* **Parameterized Queries**
+  Prevent SQL injection by separating code from data
+
+* **Password Hashing (bcrypt)**
+  Secure storage of credentials
+
+* **Input Validation (Regex)**
+  Ensures ID format (exactly 9 digits)
+
+* **Rate Limiting**
+  Blocks IP after multiple failed attempts (Brute Force protection)
+
+---
+
+## ⚠️ Limitations
+
+* Uses **SQLite** (not production-scale)
+* Some dashboard actions are **client-side simulations**
+* Database is **reset on regeneration**
+
+---
+
+## 📜 Disclaimer
+
+This project was developed strictly for **educational purposes** to demonstrate the dangers of insecure coding practices in financial systems.
+
+All data is randomly generated and does not represent real individuals.
+
+---
+
+## 👩‍💻 Author
+
+**Dana Hadassi**

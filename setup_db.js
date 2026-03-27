@@ -1,46 +1,35 @@
-// 1. IMPORT LIBRARIES
+// import libreries
 const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcrypt');
 
-// 2. INITIALIZE DATABASE CONNECTION
+// init DB connection
 const db = new sqlite3.Database('./bank_data.sqlite', (err) => {
     if (err) {
-        console.error("Error creating database:", err.message);
+        console.error("[DB ERROR] Failed to create DB:", err.message);
     } else {
-        console.log("Database connected. Generating random users...");
+        console.log("[SYSTEM] DB connected successfully.");
     }
 });
 
-// 3. HELPER ARRAYS FOR RANDOM GENERATION
-const firstNames = ["Asaf", "Benny", "Cris", "Dana", "Eliko", "Fredy", "Gal", "Hodaya", "Iris", "July", "Kobi", "Leah", "Maya", "Naama", "Or", "Paz", "Thomas", "Sarah", "Charles", "Karen"];
+// Generating random customers
+const firstNames = ["Asaf", "Benny", "Carmel", "Dana", "Eliko", "Fredy", "Gal", "Hodaya", "Iris", "July", "Kobi", "Leah", "Maya", "Naama", "Or", "Paz"];
 const lastNames = ["Cohen", "Levi", "Levy", "Hadassi", "Bachar", "Zloof", "Ozery", "Ovadya", "Ovadia", "Weiss", "Yaakov", "Halevi", "Hasson", "Swartz", "Ozer", "Katz", "Avram", "Frydman", "Ohayon", "Caspi"];
 
-// Helper function to get a random number in a range
+// get a random number
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// 4. BUILD THE TABLE AND INJECT RANDOM DATA
-db.serialize(() => {
+//  initialization function
+async function initDB() {
     
-    // Reset table for a fresh start
-    db.run("DROP TABLE IF EXISTS customers");
+    console.log("[SYSTEM] Generating customer data and hashing passwords");
+    
+    const customers = [];
 
-    // Create the structured table
-    db.run(`CREATE TABLE customers (
-        id_number TEXT PRIMARY KEY,
-        full_name TEXT NOT NULL,
-        password TEXT NOT NULL,
-        account_balance REAL,
-        credit_card_number TEXT,
-        credit_card_exp TEXT,
-        credit_card_cvv TEXT
-    )`);
-
-    // Prepare the insertion statement
-    const stmt = db.prepare("INSERT INTO customers VALUES (?, ?, ?, ?, ?, ?, ?)");
-
-    // Loop to create 50 entirely random users
+    // first generate all mock data and await password hashes 
     for (let i = 0; i < 50; i++) {
+        
         // Generate 9-digit ID
         const idNumber = String(getRandomInt(100000000, 999999999));
         
@@ -48,29 +37,72 @@ db.serialize(() => {
         const fullName = `${firstNames[getRandomInt(0, firstNames.length - 1)]} ${lastNames[getRandomInt(0, lastNames.length - 1)]}`;
         
         // Generate simple password
-        const password = "pass" + getRandomInt(1000, 9999);
+        const vulnPassword = "pass" + getRandomInt(1000, 9999);
         
-        // Generate random balance between 1,000 and 150,000
+        // Hashed password for the Secure route
+        const hashedPassword = await bcrypt.hash(vulnPassword, 10);
+        
+        // Generate random balance between 1,000-150,000
         const balance = (Math.random() * (150000 - 1000) + 1000).toFixed(2);
         
-        // Generate Realistic 16-digit Credit Card (Prefix 4580 + 12 random digits)
+        // Generate 16-digit credit card (prefix 4580 + 12 random digits)
         const ccNumber = `4580 ${String(getRandomInt(1000, 9999))} ${String(getRandomInt(1000, 9999))} ${String(getRandomInt(1000, 9999))}`;
         
-        // Generate Expiration (Month 01-12, Year 26-31)
-        const expMonth = String(getRandomInt(1, 12)).padStart(2, '0');
-        const expYear = String(getRandomInt(27, 31));
-        const ccExp = `${expMonth}/${expYear}`;
+        // Generate expiration (month 01-12, year 27-31)
+        const ccExp = `${String(getRandomInt(1, 12)).padStart(2, '0')}/${String(getRandomInt(27, 31))}`;
         
         // Generate CVV
-        const ccCvv = String(getRandomInt(100, 999));
+        const ccCVV = String(getRandomInt(100, 999));
 
-        // Execute insertion
-        stmt.run(idNumber, fullName, password, balance, ccNumber, ccExp, ccCvv);
+        customers.push({
+            id: idNumber,
+            name: fullName,
+            password: hashedPassword,
+            password_vuln: vulnPassword,
+            balance: balance,
+            cc: ccNumber,
+            exp: ccExp,
+            cvv: ccCVV
+        });
     }
 
-    stmt.finalize();
-    console.log("SUCCESS: 50 random customers successfully generated and injected into bank_data.sqlite!");
-});
 
-// 5. CLOSE CONNECTION
-db.close();
+    // building the synchronous table with random data
+    db.serialize(() => {
+        
+        // Reset table
+        db.run("DROP TABLE IF EXISTS customers");
+
+        // Create the structured table
+        // Schema includes both hashed and vulnerable plain-text passwords
+        db.run(`CREATE TABLE customers (
+            id_number TEXT PRIMARY KEY,
+            full_name TEXT NOT NULL,
+            password TEXT NOT NULL,
+            password_vuln TEXT NOT NULL,
+            account_balance REAL,
+            credit_card_number TEXT,
+            credit_card_exp TEXT,
+            credit_card_cvv TEXT
+        )`);
+
+        // insertion statement
+        const insert = db.prepare("INSERT INTO customers VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+
+        customers.forEach(customer => {
+            insert.run(customer.id, customer.name, customer.password, customer.password_vuln, customer.balance, customer.cc, customer.exp, customer.cvv);
+        });
+
+        insert.finalize();
+
+        console.log("[SYSTEM] 50 random customers successfully inserted into the database!");
+        
+        db.close((err) => {
+            if (err) console.error("[DB ERROR] Error closing DB:", err.message);
+            else console.log("[SYSTEM] DB connection closed securely.");
+        });
+    });
+}
+
+// Execute the initialization
+initDB();
