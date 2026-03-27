@@ -81,7 +81,8 @@ app.post('/login-vulnerable', (req, res) => {
         const ms = Date.now() - start;
         if (err || !row) {
             console.log(`[VULNERABLE] FAIL    | ${ms}ms | ${query}`);
-            return res.redirect(`/?error=1&last_id=${encodeURIComponent(id_number)}`);
+            // Added mode=vulnerable to the redirect URL
+            return res.redirect(`/?error=1&last_id=${encodeURIComponent(id_number)}&mode=vulnerable`);       
         }
         console.log(`[VULNERABLE] SUCCESS | ${ms}ms | ${query}`);
         res.send(buildDashboard(row));
@@ -99,8 +100,9 @@ app.post('/login-secure', loginLimiter, (req, res) => {
     // Make sure ID is a valid 9-digit number
     const idRegex = /^\d{9}$/;
     if (!idRegex.test(id_number)) {
-        console.log(`[SECURE]    FAIL    | 0ms | Invalid ID Format.`);
-        return res.redirect(`/?error=1&last_id=${encodeURIComponent(id_number)}`);
+        console.log(`[SECURE]     FAIL    | 0ms | Invalid ID Format.`);
+        // Added mode=secure to the redirect URL
+        return res.redirect(`/?error=1&last_id=${encodeURIComponent(id_number)}&mode=secure`);
     }
 
     // --- SECURITY LAYER 3: Parameterized Query ---
@@ -110,7 +112,7 @@ app.post('/login-secure', loginLimiter, (req, res) => {
     db.get(query, [id_number], async (err, row) => {
         const ms = Date.now() - start;
         if (err || !row) {
-            console.log(`[SECURE]    FAIL    | ${ms}ms | User not found `);
+            console.log(`[SECURE]     FAIL    | ${ms}ms | User not found `);
             return res.redirect(`/?error=1&last_id=${encodeURIComponent(id_number)}`);
         }
 

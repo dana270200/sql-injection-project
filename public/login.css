@@ -152,14 +152,14 @@ main {
 .modal-body h4 { color: #d91c24; margin-top: 15px; margin-bottom: 5px; font-size: 15px; }
 .modal-body code { 
     background: #f4f4f4; 
-    padding: 8px 10px; 
+    padding: 4px 8px; 
     border-radius: 4px; 
     font-family: monospace; 
     color: #c53030; 
     font-size: 13px; 
-    display: block;
-    margin-top: 5px;
-    margin-bottom: 10px;
+    display: inline-block; 
+    margin: 0 4px; 
     word-break: break-all;
+    user-select: all;
 }
 .modal-body p { margin-bottom: 10px; }
