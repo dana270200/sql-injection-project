@@ -44,8 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (urlParams.get('mode') === 'vulnerable') {
         isSecureMode = false;
         form.action = '/login-vulnerable';
-        // Delay toast slightly to ensure UI is ready
-        setTimeout(() => showToast('🔓 Security Mode: OFF (Restored)', false), 500);
     }
 
     if (urlParams.get('last_id')) {

@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutBtn.onclick = (e) => {
             e.preventDefault();
             // Check if current session is in vulnerable mode based on URL or logic
-            const isVulnerable = window.location.search.includes('vulnerable') || document.body.classList.contains('vuln-session');
+            const isVulnerable = window.location.href.includes('vulnerable')
             console.log(`isVulnerable: ${isVulnerable}`);
             // Redirect back to login while preserving the security mode
             if (isVulnerable) {
